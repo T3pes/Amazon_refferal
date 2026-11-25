@@ -1,7 +1,7 @@
 // Colori per categoria e per guida: ogni sezione ha la sua tinta (tonalità OKLCH 0-360).
 // Le categorie nuove create dall'admin ricevono una tinta stabile calcolata dallo slug.
 
-const CATEGORY_HUES: Record<string, number> = { tech: 262, casa: 150, regali: 18 };
+const CATEGORY_HUES: Record<string, number> = { tech: 262, casa: 150, regali: 18, sport: 110, funko: 300 };
 const GUIDE_HUES: Record<string, number> = {
   "regali-di-natale": 25, "regali-sotto-30-euro": 330, "regali-per-lui": 235,
   "regali-per-lei": 350, "casa-smart": 195, "cucina-facile": 65,

@@ -44,6 +44,7 @@ async function Dashboard({ searchParams }: { searchParams: PageProps<"/admin">["
           <h1 className="font-display text-3xl font-bold">Il tuo catalogo</h1>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Link href="/admin/categorie" className="btn btn-ghost">Categorie</Link>
           <Link href="/admin/guide" className="btn btn-ghost">Guide</Link>
           <Link href="/admin/telegram" className="btn btn-ghost">Telegram</Link>
           <Link href="/admin/p/nuovo" className="btn btn-primary">+ Aggiungi prodotto</Link>
