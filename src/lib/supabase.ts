@@ -18,6 +18,8 @@ type ProductRow = {
   asin: string; category: string; name: string; note: string;
   pros: string[] | null; cons: string[] | null; tags: string[] | null;
   featured: boolean; image_url: string | null;
+  /** Colonna aggiunta con lo SQL 0004: può mancare */
+  deal_only?: boolean;
 };
 
 export async function fetchCatalogFromSupabase(): Promise<{ categories: Category[]; products: CatalogEntry[] } | null> {
@@ -25,7 +27,7 @@ export async function fetchCatalogFromSupabase(): Promise<{ categories: Category
   try {
     const [cRes, pRes] = await Promise.all([
       fetch(`${URL_}/rest/v1/ar_categories?select=slug,name,emoji,blurb&order=sort.asc`, { headers: headers(), cache: "no-store" }),
-      fetch(`${URL_}/rest/v1/ar_products?select=asin,category,name,note,pros,cons,tags,featured,image_url&active=eq.true&order=sort.asc`, { headers: headers(), cache: "no-store" }),
+      fetch(`${URL_}/rest/v1/ar_products?select=*&active=eq.true&order=sort.asc`, { headers: headers(), cache: "no-store" }),
     ]);
     if (!cRes.ok || !pRes.ok) throw new Error(`HTTP ${cRes.status}/${pRes.status}`);
     const categories = (await cRes.json()) as Category[];
@@ -35,7 +37,7 @@ export async function fetchCatalogFromSupabase(): Promise<{ categories: Category
       products: rows.map((r) => ({
         asin: r.asin, category: r.category, name: r.name, note: r.note,
         pros: r.pros ?? [], cons: r.cons ?? [], tags: r.tags ?? [],
-        featured: r.featured, imageUrl: r.image_url,
+        featured: r.featured, imageUrl: r.image_url, dealOnly: r.deal_only === true,
       })),
     };
   } catch (err) {

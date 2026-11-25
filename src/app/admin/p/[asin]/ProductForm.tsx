@@ -22,6 +22,7 @@ export function ProductForm({ product, categories }: { product: AdminProduct | n
     image_url: v?.image_url ?? product?.image_url ?? "",
     active: v ? v.active === "on" : (product?.active ?? true),
     featured: v ? v.featured === "on" : (product?.featured ?? false),
+    deal_only: v ? v.deal_only === "on" : (product?.deal_only ?? false),
   };
   return (
     <form key={JSON.stringify(v ?? {})} action={action} className="grid gap-6">
@@ -58,7 +59,12 @@ export function ProductForm({ product, categories }: { product: AdminProduct | n
         <div className="flex flex-wrap gap-6 text-sm">
           <label className="flex items-center gap-2"><input type="checkbox" name="active" defaultChecked={d.active} className="h-4 w-4 accent-[var(--accent)]" /> Visibile sul sito</label>
           <label className="flex items-center gap-2"><input type="checkbox" name="featured" defaultChecked={d.featured} className="h-4 w-4 accent-[var(--accent)]" /> Tra i miei preferiti</label>
+          <label className="flex items-center gap-2"><input type="checkbox" name="deal_only" defaultChecked={d.deal_only} className="h-4 w-4 accent-[var(--accent)]" /> Solo quando è in offerta</label>
         </div>
+        <p className="-mt-2 text-xs text-muted">
+          “Solo quando è in offerta”: il prodotto compare sul sito mentre Amazon lo segnala scontato e sparisce da solo quando l&apos;offerta finisce (controllo ogni ora).
+          I prodotti in offerta finiscono anche nella sezione “In offerta adesso”.
+        </p>
       </div>
 
       {state?.error && <p role="alert" className="rounded-xl bg-accent-soft px-4 py-3 text-sm text-accent">{state.error}</p>}

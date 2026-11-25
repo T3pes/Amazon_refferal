@@ -72,12 +72,21 @@ export async function saveProductAction(_: FormState, form: FormData): Promise<F
       featured: form.get("featured") === "on",
       active: form.get("active") === "on",
       image_url: imageUrl || null,
+      deal_only: form.get("deal_only") === "on",
     };
 
-    if (mode === "new") {
-      await adminRest(session, "ar_products", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ asin, ...row }) });
-    } else {
-      await adminRest(session, `ar_products?asin=eq.${asin}`, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify(row) });
+    const write = (r: Record<string, unknown>) => mode === "new"
+      ? adminRest(session, "ar_products", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ asin, ...r }) })
+      : adminRest(session, `ar_products?asin=eq.${asin}`, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify(r) });
+    try {
+      await write(row);
+    } catch (err) {
+      // Colonna deal_only non ancora creata (SQL 0004): salva il resto
+      if (!(err as Error).message.includes("deal_only")) throw err;
+      if (row.deal_only) return { error: "Per usare “Solo in offerta” esegui prima su Supabase il file supabase-offerte.sql.", values: keep(form) };
+      const { deal_only: _omit, ...rest } = row;
+      void _omit;
+      await write(rest);
     }
   } catch (err) {
     const msg = (err as Error).message;

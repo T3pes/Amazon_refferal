@@ -1,4 +1,5 @@
 {
+  "1": "admin/layout.tsx",
   "3": "app/p/[asin]/page.tsx",
   "4": "actions.ts",
   "6": "session.ts",

@@ -17,6 +17,8 @@ export type CatalogEntry = {
   cons?: string[];
   tags?: string[];
   featured?: boolean;
+  /** Mostra il prodotto solo mentre Amazon lo segnala in offerta */
+  dealOnly?: boolean;
   /** Immagine opzionale da SiteStripe o dall'API */
   imageUrl?: string | null;
 };

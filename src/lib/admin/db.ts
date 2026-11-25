@@ -32,6 +32,8 @@ export type AdminProduct = {
   asin: string; category: string; name: string; note: string;
   pros: string[]; cons: string[]; tags: string[];
   featured: boolean; active: boolean; image_url: string | null; sort: number;
+  /** Assente finché non si esegue lo SQL 0004 */
+  deal_only?: boolean;
 };
 
 export type ClickStat = { asin: string; clic_7g: number; clic_30g: number; clic_totali: number };

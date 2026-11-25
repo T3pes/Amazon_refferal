@@ -37,6 +37,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </Link>
             <nav className="flex items-center gap-1 text-sm">
               <Link href="/#catalogo" className="hidden rounded-full px-3 py-2 text-muted hover:text-ink sm:inline">Catalogo</Link>
+              <Link href="/offerte" className="whitespace-nowrap rounded-full px-3 py-2 text-muted hover:text-ink">Offerte</Link>
               <Link href="/come-funziona" className="whitespace-nowrap rounded-full px-3 py-2 text-muted hover:text-ink">Come funziona</Link>
             </nav>
           </div>

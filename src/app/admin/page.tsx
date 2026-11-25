@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { adminRest, type AdminProduct, type ClickStat } from "@/lib/admin/db";
+import { getCatalog } from "@/lib/catalog";
 import type { Category } from "@/lib/types";
 import { guard } from "./guard";
 import { NotAdmin } from "./NotAdmin";
@@ -20,11 +21,15 @@ async function Dashboard({ searchParams }: { searchParams: PageProps<"/admin">["
   if (session === "not-admin") return <NotAdmin />;
   const { salvato } = await searchParams;
 
-  const [products, categories, stats] = await Promise.all([
+  const [products, categories, stats, catalog] = await Promise.all([
     adminRest<AdminProduct[]>(session, "ar_products?select=*&order=active.desc,sort.asc"),
     adminRest<Category[]>(session, "ar_categories?select=slug,name,emoji,blurb&order=sort.asc"),
     adminRest<ClickStat[]>(session, "ar_click_stats?select=asin,clic_7g,clic_30g,clic_totali").catch(() => [] as ClickStat[]),
+    // Leggerlo qui lo ricalcola subito dopo ogni salvataggio
+    getCatalog(),
   ]);
+  const saving = new Map(catalog.products.map((p) => [p.asin, p.live?.savingPercent ?? 0]));
+  const ended = new Set(catalog.endedDeals);
   const statOf = new Map(stats.map((s) => [s.asin, s]));
   const catOf = new Map(categories.map((c) => [c.slug, c]));
   const active = products.filter((p) => p.active).length;
@@ -45,6 +50,17 @@ async function Dashboard({ searchParams }: { searchParams: PageProps<"/admin">["
         </div>
       </header>
 
+      {ended.size > 0 && (
+        <p className="rounded-xl bg-accent-soft px-4 py-3 text-sm text-accent">
+          {ended.size === 1 ? "1 prodotto “solo in offerta” è nascosto" : `${ended.size} prodotti “solo in offerta” sono nascosti`} perché l&apos;offerta è finita.
+          Tornano da soli alla prossima offerta, oppure puoi eliminarli da “Modifica”.
+        </p>
+      )}
+      {!catalog.offersKnown && products.some((p) => p.deal_only) && (
+        <p className="rounded-xl bg-surface-2 px-4 py-3 text-sm text-muted">
+          I prodotti “solo in offerta” restano nascosti finché Amazon non ci passa i dati sulle offerte (servono 10 vendite in 30 giorni per la Creators API).
+        </p>
+      )}
       {salvato && <p role="status" className="rounded-xl bg-good/10 px-4 py-3 text-sm text-good">Salvato. Il sito pubblico è già aggiornato.</p>}
 
       <section className="grid gap-4 sm:grid-cols-3">
@@ -67,6 +83,10 @@ async function Dashboard({ searchParams }: { searchParams: PageProps<"/admin">["
                   <p className="truncate font-medium">{p.name}</p>
                   <p className="truncate text-xs text-muted">
                     {c ? `${c.emoji} ${c.name}` : p.category} · {p.asin}{!p.note && <span className="ml-1 text-accent">· manca “perché lo consiglio”</span>}
+                    {(saving.get(p.asin) ?? 0) > 0 && <span className="ml-1 font-semibold text-good">· in offerta −{saving.get(p.asin)}%</span>}
+                    {p.deal_only && (ended.has(p.asin)
+                      ? <span className="ml-1 text-accent">· solo in offerta: finita, nascosto</span>
+                      : <span className="ml-1">· solo in offerta</span>)}
                   </p>
                 </div>
                 <span className="text-sm tabular-nums text-muted">{s ? `${s.clic_7g} / ${s.clic_30g}` : "0 / 0"}</span>
