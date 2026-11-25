@@ -1,1 +1,7 @@
-{"0": "package.json", "1": "next", "2": "compilerOptions", "3": "[asin]/page.tsx", "4": "catalog.ts", "5": "affiliate.ts", "6": "creators-api.ts", "7": "scripts"}
+{
+  "0": "package.json",
+  "1": "next",
+  "2": "compilerOptions",
+  "3": "[asin]/page.tsx",
+  "5": "affiliate.ts"
+}

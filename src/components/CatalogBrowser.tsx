@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useDeferredValue, useMemo, useState } from "react";
 import type { Category, Product } from "@/lib/types";
 import { ProductCard } from "./ProductCard";
@@ -58,7 +59,12 @@ export function CatalogBrowser({ categories, products }: { categories: Category[
         <h2 className="font-display text-2xl font-bold">{activeCategory ? activeCategory.name : "Tutti i consigli"}</h2>
         <p className="text-sm text-muted" aria-live="polite">{visible.length} {visible.length === 1 ? "prodotto" : "prodotti"}</p>
       </div>
-      {activeCategory && <p className="-mt-3 mb-6 text-muted">{activeCategory.blurb}</p>}
+      {activeCategory && (
+        <p className="-mt-3 mb-6 text-muted">
+          {activeCategory.blurb}{" "}
+          <Link href={`/c/${activeCategory.slug}`} className="whitespace-nowrap font-medium text-accent hover:underline">Pagina della categoria →</Link>
+        </p>
+      )}
 
       {visible.length > 0 ? (
         <div key={`${cat}-${deferredQuery}`} className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

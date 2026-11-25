@@ -10,6 +10,12 @@ const body = Inter({ variable: "--font-body", subsets: ["latin"] });
 export const metadata: Metadata = {
   title: { default: `${SITE.name} · ${SITE.tagline}`, template: `%s · ${SITE.name}` },
   description: SITE.description,
+  metadataBase: new URL(SITE.url),
+  alternates: { canonical: "/" },
+  applicationName: SITE.name,
+  openGraph: { type: "website", locale: "it_IT", siteName: SITE.name, title: SITE.name, description: SITE.description, url: "/" },
+  twitter: { card: "summary_large_image" },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {

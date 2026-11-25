@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { JsonLd } from "@/components/JsonLd";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductImage } from "@/components/ProductImage";
 import { Price } from "@/components/Price";
 import { getCatalog, getProduct } from "@/lib/catalog";
 import { SITE } from "@/lib/site";
+import { breadcrumbLd, clip } from "@/lib/seo";
 
 export async function generateStaticParams() {
   const { products } = await getCatalog();
@@ -16,7 +18,14 @@ export async function generateMetadata({ params }: PageProps<"/p/[asin]">): Prom
   const { asin } = await params;
   const { product } = await getProduct(asin);
   if (!product) return {};
-  return { title: product.name, description: product.note || `${product.name}: scelto da ${SITE.name}.` };
+  const description = clip(product.note || `${product.name}: scelto e consigliato da ${SITE.name}.`);
+  const url = `/p/${asin}`;
+  return {
+    title: product.name,
+    description,
+    alternates: { canonical: url },
+    openGraph: { type: "article", title: product.name, description, url },
+  };
 }
 
 export default async function ProductPage({ params }: PageProps<"/p/[asin]">) {
@@ -31,10 +40,15 @@ export default async function ProductPage({ params }: PageProps<"/p/[asin]">) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      <JsonLd data={breadcrumbLd([
+        { name: "Catalogo", path: "/" },
+        ...(category ? [{ name: category.name, path: `/c/${category.slug}` }] : []),
+        { name: product.name, path: `/p/${product.asin}` },
+      ])} />
       <nav className="rise py-6 text-sm text-muted" aria-label="Percorso">
         <Link href="/" className="hover:text-ink">Catalogo</Link>
         <span className="mx-2">/</span>
-        <span>{category?.name ?? "Prodotto"}</span>
+        {category ? <Link href={`/c/${category.slug}`} className="hover:text-ink">{category.name}</Link> : <span>Prodotto</span>}
       </nav>
 
       <article className="grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-12">
@@ -93,7 +107,10 @@ export default async function ProductPage({ params }: PageProps<"/p/[asin]">) {
 
       {related.length > 0 && (
         <section className="mt-20">
-          <h2 className="mb-6 font-display text-2xl font-bold">Nella stessa categoria</h2>
+          <div className="mb-6 flex items-baseline justify-between gap-4">
+            <h2 className="font-display text-2xl font-bold">Nella stessa categoria</h2>
+            {category && <Link href={`/c/${category.slug}`} className="text-sm font-medium text-accent hover:underline">Vedi tutti →</Link>}
+          </div>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {related.map((p, i) => <ProductCard key={p.asin} product={p} emoji={emoji} index={i} />)}
           </div>

@@ -1,5 +1,7 @@
 {
+  "3": "app/p/[asin]/page.tsx",
   "4": "actions.ts",
-  "6": "creators-api.ts",
-  "7": "session.ts"
+  "6": "session.ts",
+  "7": "site.ts",
+  "8": "catalog.ts"
 }

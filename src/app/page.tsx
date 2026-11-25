@@ -1,6 +1,8 @@
 import { CatalogBrowser } from "@/components/CatalogBrowser";
+import { JsonLd } from "@/components/JsonLd";
 import { getCatalog } from "@/lib/catalog";
 import { SITE } from "@/lib/site";
+import { itemListLd } from "@/lib/seo";
 
 export default async function Home() {
   const { categories, products } = await getCatalog();
@@ -8,6 +10,10 @@ export default async function Home() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      <JsonLd data={{ "@graph": [
+        { "@type": "WebSite", name: SITE.name, url: SITE.url, description: SITE.description, inLanguage: "it-IT" },
+        itemListLd(`Catalogo ${SITE.name}`, products),
+      ] }} />
       <section className="rise py-14 sm:py-20">
         <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1 text-sm font-medium text-accent">
           <span aria-hidden>✦</span> {products.length} prodotti scelti a mano · {featured} preferiti
