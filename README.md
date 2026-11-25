@@ -1,36 +1,22 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Scelti da Flavio · catalogo Amazon affiliato
 
-## Getting Started
+Catalogo pubblico (senza registrazione) di prodotti Amazon scelti a mano, con link affiliato `dealsforev0bc-21`.
 
-First, run the development server:
+- **Stack:** Next.js 16 (App Router, Cache Components) · Tailwind 4 · Supabase · Vercel
+- **Catalogo:** tabella `ar_products` su Supabase. Se Supabase non risponde, usa `src/data/seed.ts`.
+- **Dati live (titolo, immagine, prezzo):** Amazon Creators API, cache di 1 ora (limite Amazon per i prezzi). Senza credenziali il sito funziona lo stesso, senza prezzi.
+- **Link:** ogni pulsante passa da `/go/ASIN`, che registra il clic in forma anonima (`ar_clicks`) e reindirizza ad Amazon. Solo ASIN presenti nel catalogo.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Comandi
+```
+npm install
+npm run dev     # sviluppo
+npm test        # test del generatore di link affiliati
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Variabili d'ambiente
+Vedi `.env.example`. Il segreto della Creators API va solo nelle variabili di Vercel (tipo "sensitive"), mai nel codice.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Database
+Esegui `supabase/migrations/0001_catalogo.sql` nell'SQL Editor di Supabase.
