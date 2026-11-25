@@ -30,6 +30,7 @@ const RESOURCES = [
   "offersV2.listings.availability",
 ];
 
+export let lastCreatorsError: string | null = null;
 let cachedToken: { value: string; expiresAt: number } | null = null;
 
 export function creatorsApiConfigured(): boolean {
@@ -55,7 +56,10 @@ async function getToken(): Promise<string> {
         body: JSON.stringify({ grant_type: "client_credentials", client_id: id, client_secret: secret, scope: "creatorsapi::default" }),
         cache: "no-store",
       });
-  if (!res.ok) throw new Error(`Token Creators API: HTTP ${res.status}`);
+  if (!res.ok) {
+    const body = (await res.text()).slice(0, 200);
+    throw new Error(`Token Creators API (v${version}): HTTP ${res.status} ${body}`);
+  }
   const data = (await res.json()) as { access_token: string; expires_in?: number };
   cachedToken = { value: data.access_token, expiresAt: Date.now() + (data.expires_in ?? 3600) * 1000 };
   return data.access_token;
@@ -103,7 +107,8 @@ export async function getItems(asins: string[]): Promise<Map<string, LiveData>> 
         cache: "no-store",
       });
       if (!res.ok) {
-        console.warn(`Creators API getItems: HTTP ${res.status}`);
+        lastCreatorsError = `getItems: HTTP ${res.status} ${(await res.text()).slice(0, 200)}`;
+        console.warn(`Creators API ${lastCreatorsError}`);
         continue;
       }
       const data: any = await res.json();
@@ -113,7 +118,8 @@ export async function getItems(asins: string[]): Promise<Map<string, LiveData>> 
       if (i + 10 < asins.length) await new Promise((r) => setTimeout(r, 1100));
     }
   } catch (err) {
-    console.warn("Creators API non disponibile:", (err as Error).message);
+    lastCreatorsError = (err as Error).message;
+    console.warn("Creators API non disponibile:", lastCreatorsError);
   }
   return out;
 }
