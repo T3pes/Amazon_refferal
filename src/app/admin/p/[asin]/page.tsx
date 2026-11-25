@@ -7,6 +7,8 @@ import type { Category } from "@/lib/types";
 import { guard } from "../../guard";
 import { NotAdmin } from "../../NotAdmin";
 import { ProductForm } from "./ProductForm";
+import { TelegramButton } from "../../TelegramButton";
+import { sendProductAction } from "../../telegram-actions";
 
 export default function Page(props: PageProps<"/admin/p/[asin]">) {
   return (
@@ -34,6 +36,9 @@ async function Editor({ params }: { params: PageProps<"/admin/p/[asin]">["params
       <Link href="/admin" className="text-sm text-muted hover:text-ink">← Catalogo</Link>
       <h1 className="font-display text-3xl font-bold">{isNew ? "Aggiungi un prodotto" : rows[0].name}</h1>
       <ProductForm product={isNew ? null : rows[0]} categories={categories} />
+      {!isNew && rows[0].active && (
+        <div className="card p-5"><TelegramButton action={sendProductAction} name="asin" value={rows[0].asin} /></div>
+      )}
     </div>
   );
 }

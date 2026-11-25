@@ -1,10 +1,10 @@
 {
-  "1": "next",
+  "1": "session.ts",
   "3": "app/p/[asin]/page.tsx",
-  "4": "actions.ts",
-  "5": "getCatalog",
+  "4": "telegram-actions.ts",
+  "5": "vercel.json",
   "6": "session.ts",
   "7": "site.ts",
   "8": "catalog.ts",
-  "9": "guide-actions.ts"
+  "9": "guide/page.tsx"
 }

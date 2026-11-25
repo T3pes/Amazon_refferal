@@ -76,3 +76,20 @@ export async function fetchGuidesFromSupabase(): Promise<Guide[] | null> {
     return null;
   }
 }
+
+/** true = offerta da pubblicare su Telegram (e già registrata). null = registro non disponibile. */
+export async function claimTelegramDeal(asin: string, saving: number): Promise<boolean | null> {
+  if (!supabaseConfigured()) return null;
+  try {
+    const res = await fetch(`${URL_}/rest/v1/rpc/ar_telegram_claim`, {
+      method: "POST",
+      headers: headers({ "Content-Type": "application/json" }),
+      body: JSON.stringify({ p_ref: asin, p_saving: Math.round(saving) }),
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return (await res.json()) === true;
+  } catch {
+    return null;
+  }
+}

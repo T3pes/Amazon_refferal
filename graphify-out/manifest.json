@@ -132,9 +132,9 @@
     "semantic_hash": ""
   },
   "src/lib/supabase.ts": {
-    "mtime": 1795621537.4032667,
-    "seen": 1795621635.7723458,
-    "ast_hash": "019701d2a939dfa5dc2529edca631545",
+    "mtime": 1795622808.9470115,
+    "seen": 1795623015.2561073,
+    "ast_hash": "ce57b2b672addd0bd612f12699586861",
     "semantic_hash": ""
   },
   "src/lib/types.ts": {
@@ -198,15 +198,15 @@
     "semantic_hash": ""
   },
   "src/app/admin/p/[asin]/page.tsx": {
-    "mtime": 1795618308.805521,
-    "seen": 1795618525.5826452,
-    "ast_hash": "fde2771fba33b7993f331f3eb52c6513",
+    "mtime": 1795622859.1393578,
+    "seen": 1795623015.2549973,
+    "ast_hash": "801550cb82dd9cc4c7aa9a58ecb18744",
     "semantic_hash": ""
   },
   "src/app/admin/page.tsx": {
-    "mtime": 1795621581.4180248,
-    "seen": 1795621635.7712944,
-    "ast_hash": "3d2796c133863f3866f1cbcece5d2953",
+    "mtime": 1795622859.138967,
+    "seen": 1795623015.254999,
+    "ast_hash": "9d17d1137b58f721647deb53e66dab63",
     "semantic_hash": ""
   },
   "src/app/admin/sessione/route.ts": {
@@ -360,9 +360,9 @@
     "semantic_hash": ""
   },
   "src/app/admin/guide/[slug]/page.tsx": {
-    "mtime": 1795620701.6587174,
-    "seen": 1795621124.5376031,
-    "ast_hash": "09463186e5ed4a4fafb246378dabf4bc",
+    "mtime": 1795622859.1416636,
+    "seen": 1795623015.2548223,
+    "ast_hash": "516ffbc7dde8385765cba9d9a4d6230a",
     "semantic_hash": ""
   },
   "src/app/admin/guide/page.tsx": {
@@ -447,6 +447,72 @@
     "mtime": 1795622111.1789725,
     "seen": 1795622333.7270944,
     "ast_hash": "08b18814a467597fbaf2444a75f2566d",
+    "semantic_hash": ""
+  },
+  "src/app/admin/TelegramButton.tsx": {
+    "mtime": 1795622836.301869,
+    "seen": 1795623015.2546535,
+    "ast_hash": "efbe463ff299898d18cb420a50e78330",
+    "semantic_hash": ""
+  },
+  "src/app/admin/telegram-actions.ts": {
+    "mtime": 1795623006.6680238,
+    "seen": 1795623015.2550287,
+    "ast_hash": "29b1dd1275041c8bc1e1982d3c8c2915",
+    "semantic_hash": ""
+  },
+  "src/app/admin/telegram/page.tsx": {
+    "mtime": 1795623006.6651413,
+    "seen": 1795623015.2550309,
+    "ast_hash": "930ee13d9880c664bab08d497fe2e2c0",
+    "semantic_hash": ""
+  },
+  "src/app/api/telegram/offerte/route.ts": {
+    "mtime": 1795622836.2983575,
+    "seen": 1795623015.2550635,
+    "ast_hash": "77848e9e1056536c4238617b29ea987f",
+    "semantic_hash": ""
+  },
+  "src/lib/telegram-deals.ts": {
+    "mtime": 1795622916.4451087,
+    "seen": 1795623015.256109,
+    "ast_hash": "7d8bff822c403b13277066747604d9f5",
+    "semantic_hash": ""
+  },
+  "src/lib/telegram-format.test.ts": {
+    "mtime": 1795622788.598543,
+    "seen": 1795623015.2561107,
+    "ast_hash": "d4b1096cec9d5fe8a62af5235afcd481",
+    "semantic_hash": ""
+  },
+  "src/lib/telegram-format.ts": {
+    "mtime": 1795622788.5998816,
+    "seen": 1795623015.2561119,
+    "ast_hash": "c246914a01765e0f420460b406ced70d",
+    "semantic_hash": ""
+  },
+  "src/lib/telegram-topics.test.ts": {
+    "mtime": 1795622885.4235835,
+    "seen": 1795623015.2561133,
+    "ast_hash": "28782832a62a3321f4d5019df3e30b15",
+    "semantic_hash": ""
+  },
+  "src/lib/telegram-topics.ts": {
+    "mtime": 1795622885.4249058,
+    "seen": 1795623015.256115,
+    "ast_hash": "377248709c8075b279e8cd74dd9873e2",
+    "semantic_hash": ""
+  },
+  "src/lib/telegram.ts": {
+    "mtime": 1795622939.4943423,
+    "seen": 1795623015.2561162,
+    "ast_hash": "20ef0d1473a8a85ea187dc06f2b948af",
+    "semantic_hash": ""
+  },
+  "vercel.json": {
+    "mtime": 1795622836.29954,
+    "seen": 1795623015.2561631,
+    "ast_hash": "676cae300ca9ea9fe6af48b9c8b68da0",
     "semantic_hash": ""
   },
   "package-lock.json": {

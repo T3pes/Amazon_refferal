@@ -45,6 +45,7 @@ async function Dashboard({ searchParams }: { searchParams: PageProps<"/admin">["
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href="/admin/guide" className="btn btn-ghost">Guide</Link>
+          <Link href="/admin/telegram" className="btn btn-ghost">Telegram</Link>
           <Link href="/admin/p/nuovo" className="btn btn-primary">+ Aggiungi prodotto</Link>
           <form action={logoutAction}><button className="btn btn-ghost">Esci</button></form>
         </div>

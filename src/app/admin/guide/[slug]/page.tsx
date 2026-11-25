@@ -7,6 +7,8 @@ import { guard } from "../../guard";
 import { NotAdmin } from "../../NotAdmin";
 import { MissingTable } from "../MissingTable";
 import { GuideForm } from "./GuideForm";
+import { TelegramButton } from "../../TelegramButton";
+import { sendGuideAction } from "../../telegram-actions";
 
 export default function Page(props: PageProps<"/admin/guide/[slug]">) {
   return (
@@ -44,6 +46,9 @@ async function Editor({ params }: { params: PageProps<"/admin/guide/[slug]">["pa
       <Link href="/admin/guide" className="text-sm text-muted hover:text-ink">← Guide</Link>
       <h1 className="font-display text-3xl font-bold">{isNew ? "Nuova guida" : rows[0].title}</h1>
       <GuideForm guide={isNew ? null : rows[0]} products={products} categories={categories} />
+      {!isNew && rows[0].active && (
+        <div className="card p-5"><TelegramButton action={sendGuideAction} name="slug" value={rows[0].slug} label="Invia la guida su Telegram" /></div>
+      )}
     </div>
   );
 }
