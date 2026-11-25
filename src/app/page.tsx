@@ -1,11 +1,12 @@
 import { CatalogBrowser } from "@/components/CatalogBrowser";
+import { GuideStrip } from "@/components/GuideStrip";
 import { JsonLd } from "@/components/JsonLd";
 import { getCatalog } from "@/lib/catalog";
 import { SITE } from "@/lib/site";
 import { itemListLd } from "@/lib/seo";
 
 export default async function Home() {
-  const { categories, products } = await getCatalog();
+  const { categories, products, guides } = await getCatalog();
   const featured = products.filter((p) => p.featured).length;
 
   return (
@@ -30,6 +31,8 @@ export default async function Home() {
           <a href="/come-funziona" className="btn btn-ghost">Come funziona</a>
         </div>
       </section>
+
+      <GuideStrip guides={guides} />
 
       <CatalogBrowser categories={categories} products={products} />
     </div>

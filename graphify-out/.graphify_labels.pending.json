@@ -3,5 +3,6 @@
   "4": "actions.ts",
   "6": "session.ts",
   "7": "site.ts",
-  "8": "catalog.ts"
+  "8": "catalog.ts",
+  "9": "guide-actions.ts"
 }

@@ -44,3 +44,14 @@ export async function isAdmin(session: Session): Promise<boolean> {
     return false;
   }
 }
+
+export type AdminGuide = {
+  slug: string; title: string; emoji: string; intro: string;
+  tags: string[]; asins: string[]; ends_on: string | null; active: boolean; sort: number;
+};
+
+/** true se la tabella delle guide non è ancora stata creata (SQL 0003 non eseguito). */
+export function isMissingTable(err: unknown): boolean {
+  const m = (err as Error)?.message ?? "";
+  return m.includes("PGRST205") || m.includes("42P01") || m.includes("does not exist") || m.includes("Could not find the table");
+}

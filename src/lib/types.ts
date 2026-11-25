@@ -38,3 +38,18 @@ export type Product = CatalogEntry & {
   /** Link affiliato finale (dall'API se presente, altrimenti /dp/ASIN?tag=…) */
   url: string;
 };
+
+/** Guida tematica (Black Friday, Natale, Regali sotto 30€…), gestita dall'admin. */
+export type Guide = {
+  slug: string;
+  title: string;
+  emoji: string;
+  /** Testo introduttivo, 1-3 frasi */
+  intro: string;
+  /** Include in automatico i prodotti con queste etichette */
+  tags: string[];
+  /** Prodotti scelti a mano, in quest'ordine */
+  asins: string[];
+  /** Ultimo giorno online (AAAA-MM-GG), poi la guida sparisce da sola */
+  endsOn: string | null;
+};

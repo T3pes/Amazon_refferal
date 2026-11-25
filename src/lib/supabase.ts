@@ -1,5 +1,5 @@
 import "server-only";
-import type { CatalogEntry, Category } from "./types";
+import type { CatalogEntry, Category, Guide } from "./types";
 
 // Accesso a Supabase via REST (PostgREST) con la chiave pubblica.
 // Le tabelle hanno RLS: in lettura solo prodotti attivi, in scrittura solo i clic.
@@ -56,5 +56,21 @@ export async function logClick(asin: string, source: string | null): Promise<voi
     });
   } catch {
     /* il redirect non deve mai fallire per colpa delle statistiche */
+  }
+}
+
+type GuideRow = { slug: string; title: string; emoji: string; intro: string; tags: string[] | null; asins: string[] | null; ends_on: string | null };
+
+/** Guide attive. null = tabella non ancora creata o Supabase non raggiungibile. */
+export async function fetchGuidesFromSupabase(): Promise<Guide[] | null> {
+  if (!supabaseConfigured()) return null;
+  try {
+    const res = await fetch(`${URL_}/rest/v1/ar_guides?select=slug,title,emoji,intro,tags,asins,ends_on&active=eq.true&order=sort.asc`, { headers: headers(), cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const rows = (await res.json()) as GuideRow[];
+    return rows.map((r) => ({ slug: r.slug, title: r.title, emoji: r.emoji, intro: r.intro, tags: r.tags ?? [], asins: r.asins ?? [], endsOn: r.ends_on }));
+  } catch (err) {
+    console.warn("Guide da Supabase non disponibili, uso quelle di partenza:", (err as Error).message);
+    return null;
   }
 }

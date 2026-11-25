@@ -38,7 +38,8 @@ async function Dashboard({ searchParams }: { searchParams: PageProps<"/admin">["
           <p className="text-sm text-muted">{session.email}</p>
           <h1 className="font-display text-3xl font-bold">Il tuo catalogo</h1>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Link href="/admin/guide" className="btn btn-ghost">Guide</Link>
           <Link href="/admin/p/nuovo" className="btn btn-primary">+ Aggiungi prodotto</Link>
           <form action={logoutAction}><button className="btn btn-ghost">Esci</button></form>
         </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { GuideStrip } from "@/components/GuideStrip";
 import { JsonLd } from "@/components/JsonLd";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductImage } from "@/components/ProductImage";
@@ -37,6 +38,7 @@ export default async function ProductPage({ params }: PageProps<"/p/[asin]">) {
   const emoji = category?.emoji ?? "🛍️";
   const related = catalog.products.filter((p) => p.category === product.category && p.asin !== product.asin).slice(0, 3);
   const features = product.live?.features?.slice(0, 5) ?? [];
+  const inGuides = catalog.guides.filter((g) => g.products.some((p) => p.asin === product.asin));
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -104,6 +106,8 @@ export default async function ProductPage({ params }: PageProps<"/p/[asin]">) {
           <p className="text-xs text-muted">{SITE.disclosure}</p>
         </div>
       </article>
+
+      {inGuides.length > 0 && <div className="mt-20"><GuideStrip guides={inGuides} title="Lo trovi anche in" /></div>}
 
       {related.length > 0 && (
         <section className="mt-20">

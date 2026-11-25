@@ -1,5 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 
 // Sessione admin: token Supabase Auth in cookie httpOnly.
 // I permessi veri li fa il database (RLS con ar_is_admin()).
@@ -59,6 +60,7 @@ export async function readSession(): Promise<Session | "expired" | null> {
   const token = jar.get(AT)?.value;
   if (!token) return jar.get(RT)?.value ? "expired" : null;
   const { exp, email } = decode(token);
+  await connection(); // l'ora attuale va letta a ogni richiesta, mai in un prerender
   if (!exp || exp * 1000 < Date.now() + 30_000) return jar.get(RT)?.value ? "expired" : null;
   return { token, email: email ?? "" };
 }
