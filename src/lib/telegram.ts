@@ -57,7 +57,7 @@ export type FoundChat = { id: number; title: string; type: string; topics: { id:
  */
 export async function recentChats(): Promise<FoundChat[]> {
   type C = { id: number; title?: string; type: string; username?: string };
-  type M = { chat: C; message_thread_id?: number; is_topic_message?: boolean; forum_topic_created?: { name: string }; reply_to_message?: { forum_topic_created?: { name: string } } };
+  type M = { chat: C; message_thread_id?: number; is_topic_message?: boolean; forum_topic_created?: { name: string }; reply_to_message?: { forum_topic_created?: { name: string } }; text?: string };
   type U = { channel_post?: M; my_chat_member?: { chat: C }; message?: M };
   const updates = await call<U[]>("getUpdates", { allowed_updates: ["channel_post", "my_chat_member", "message"] });
   const seen = new Map<number, FoundChat>();
@@ -67,10 +67,22 @@ export async function recentChats(): Promise<FoundChat[]> {
     if (!c || c.type === "private") continue;
     const chat = seen.get(c.id) ?? { id: c.id, title: c.title ?? c.username ?? String(c.id), type: c.type, topics: [] };
     const name = m?.forum_topic_created?.name ?? m?.reply_to_message?.forum_topic_created?.name;
-    if (m?.message_thread_id && m.is_topic_message !== false && name && !chat.topics.some((t) => t.id === m.message_thread_id)) {
-      chat.topics.push({ id: m.message_thread_id, name });
+    const tid = m?.message_thread_id;
+    if (tid && m.is_topic_message !== false) {
+      const known = chat.topics.find((t) => t.id === tid);
+      if (!known) chat.topics.push({ id: tid, name: name ?? `argomento #${tid}${m.text ? ` («${m.text.slice(0, 30)}»)` : ""}` });
+      else if (name && known.name.startsWith("argomento #")) known.name = name;
     }
     seen.set(c.id, chat);
   }
   return [...seen.values()];
+}
+
+export type BotDiagnosis = { webhook?: string; pending: number; lastError?: string; readsAll?: boolean };
+
+/** Perché il bot non vede i messaggi: webhook di un altro servizio, privacy, errori. */
+export async function botDiagnosis(): Promise<BotDiagnosis> {
+  const w = await call<{ url?: string; pending_update_count?: number; last_error_message?: string }>("getWebhookInfo");
+  const me = await call<{ can_read_all_group_messages?: boolean }>("getMe");
+  return { webhook: w.url || undefined, pending: w.pending_update_count ?? 0, lastError: w.last_error_message, readsAll: me.can_read_all_group_messages };
 }

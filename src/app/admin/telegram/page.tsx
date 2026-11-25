@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { botInfo, recentChats, telegramConfigured } from "@/lib/telegram";
+import { botDiagnosis, botInfo, recentChats, telegramConfigured, type BotDiagnosis, type FoundChat } from "@/lib/telegram";
 import { getCatalog } from "@/lib/catalog";
 import { guard } from "../guard";
 import { NotAdmin } from "../NotAdmin";
@@ -20,7 +20,12 @@ async function Panel() {
   if (session === "not-admin") return <NotAdmin />;
   const cfg = telegramConfigured();
   const bot = cfg.token ? await botInfo() : null;
-  const chats = cfg.token ? await recentChats().catch(() => []) : [];
+  let chats: FoundChat[] = [];
+  let chatsError = "";
+  if (cfg.token) {
+    try { chats = await recentChats(); } catch (e) { chatsError = e instanceof Error ? e.message : String(e); }
+  }
+  const diag: BotDiagnosis | null = cfg.token && chats.length === 0 ? await botDiagnosis().catch(() => null) : null;
   const { categories } = await getCatalog();
   const topicNames = new Map(chats.flatMap((c) => c.topics.map((t) => [t.id, t.name] as const)));
 
@@ -56,7 +61,15 @@ async function Panel() {
                 </li>
               ))}
             </ul>
-          ) : <p className="text-sm text-accent">Nessun gruppo trovato per ora.</p>}
+          ) : (
+            <div className="grid gap-1 text-sm">
+              <p className="text-accent">Nessun gruppo trovato per ora.</p>
+              {chatsError && <p className="text-muted">Errore da Telegram: {chatsError}</p>}
+              {diag?.webhook && <p className="text-muted">Il bot è collegato a un altro servizio (webhook {new URL(diag.webhook).host}): finché resta attivo, i messaggi vanno lì e questa pagina non li vede.</p>}
+              {diag && !diag.webhook && diag.readsAll === false && <p className="text-muted">Il bot legge solo i messaggi che lo menzionano: rendilo amministratore del gruppo, oppure in un argomento scrivi un messaggio che inizi con @{bot?.username}.</p>}
+              {diag?.lastError && <p className="text-muted">Ultimo errore: {diag.lastError}</p>}
+            </div>
+          )}
           <p className="text-sm text-muted">
             Su Vercel imposta <code>TELEGRAM_TOPICS</code> abbinando la categoria del sito al numero dell&apos;argomento, per esempio
             <code className="ml-1 rounded bg-surface-2 px-1.5 py-0.5">tech:12, casa:34, sport:56, funko:78</code>.
