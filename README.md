@@ -20,3 +20,10 @@ Vedi `.env.example`. Il segreto della Creators API va solo nelle variabili di Ve
 
 ## Database
 Esegui `supabase/migrations/0001_catalogo.sql` nell'SQL Editor di Supabase.
+
+## Pannello admin (`/admin`)
+- Login con un utente Supabase Auth la cui email è nella tabella `ar_admins` (vedi `supabase/migrations/0002_admin.sql`).
+- Aggiungi prodotti incollando un link Amazon, un link amzn.to o l'ASIN; modifica testi, preferiti e visibilità; vedi i clic.
+- Ogni salvataggio aggiorna subito il sito pubblico (`updateTag("catalog")`).
+- Sicurezza: i permessi li applica il database (RLS + `ar_is_admin()`), le Server Action ricontrollano la sessione.
+- `/api/stato`: diagnostica senza segreti; da admin loggato prova anche la Creators API.

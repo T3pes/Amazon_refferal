@@ -1,5 +1,5 @@
 import "server-only";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { buildAffiliateUrl } from "./affiliate";
 import { getItems } from "./creators-api";
 import { fetchCatalogFromSupabase } from "./supabase";
@@ -14,6 +14,7 @@ export type Catalog = { categories: Category[]; products: Product[]; updatedAt: 
 export async function getCatalog(): Promise<Catalog> {
   "use cache";
   cacheLife("hours");
+  cacheTag("catalog");
 
   const source = (await fetchCatalogFromSupabase()) ?? { categories: CATEGORIES, products: SEED_PRODUCTS };
   const live = await getItems(source.products.map((p) => p.asin));
