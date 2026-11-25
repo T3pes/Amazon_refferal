@@ -1,6 +1,7 @@
 import "server-only";
 import type { TelegramMessage } from "./telegram-format";
 import { parseTopics, topicFor } from "./telegram-topics";
+import { fetchCategoryTopics } from "./supabase";
 
 // Bot Telegram: TELEGRAM_BOT_TOKEN e TELEGRAM_CHAT_ID solo nelle variabili di Vercel.
 const TOKEN = () => process.env.TELEGRAM_BOT_TOKEN?.trim();
@@ -10,9 +11,28 @@ export function telegramConfigured() {
   return { token: Boolean(TOKEN()), chat: Boolean(CHAT()), topics: parseTopics(process.env.TELEGRAM_TOPICS ?? "") };
 }
 
-/** Argomento del gruppo per una categoria del sito (guide e categorie senza argomento → General). */
-export function threadFor(category?: string): number | undefined {
-  return topicFor(parseTopics(process.env.TELEGRAM_TOPICS ?? ""), category ?? "general");
+/**
+ * Argomento del gruppo per una categoria del sito (guide e categorie senza argomento → General).
+ * Prima l'argomento salvato sulla categoria (creato in automatico), poi TELEGRAM_TOPICS.
+ */
+export async function threadFor(category?: string): Promise<number | undefined> {
+  const topics = { ...parseTopics(process.env.TELEGRAM_TOPICS ?? ""), ...(await fetchCategoryTopics()) };
+  return topicFor(topics, category ?? "general");
+}
+
+/** Crea un argomento nel gruppo (il bot deve poter gestire gli argomenti). Restituisce il suo numero. */
+export async function createTopic(name: string): Promise<number> {
+  const chat_id = CHAT();
+  if (!chat_id) throw new Error("Manca TELEGRAM_CHAT_ID su Vercel.");
+  const r = await call<{ message_thread_id: number }>("createForumTopic", { chat_id, name: name.slice(0, 128) });
+  return r.message_thread_id;
+}
+
+/** Rinomina un argomento esistente. */
+export async function renameTopic(id: number, name: string): Promise<void> {
+  const chat_id = CHAT();
+  if (!chat_id) return;
+  await call("editForumTopic", { chat_id, message_thread_id: id, name: name.slice(0, 128) });
 }
 
 async function call<T>(method: string, body?: Record<string, unknown>): Promise<T> {
@@ -33,7 +53,7 @@ export async function sendTelegram(msg: TelegramMessage, category?: string): Pro
   const chat_id = CHAT();
   if (!chat_id) throw new Error("Manca TELEGRAM_CHAT_ID su Vercel.");
   const reply_markup = { inline_keyboard: [[{ text: msg.buttonText, url: msg.buttonUrl }]] };
-  const message_thread_id = threadFor(category);
+  const message_thread_id = await threadFor(category);
   if (msg.photo) {
     try {
       await call("sendPhoto", { chat_id, message_thread_id, photo: msg.photo, caption: msg.text, parse_mode: "HTML", reply_markup });

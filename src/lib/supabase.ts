@@ -93,3 +93,16 @@ export async function claimTelegramDeal(asin: string, saving: number): Promise<b
     return null;
   }
 }
+
+/** Argomenti Telegram salvati sulle categorie (colonna telegram_topic, SQL 0007: può mancare). */
+export async function fetchCategoryTopics(): Promise<Record<string, number>> {
+  if (!supabaseConfigured()) return {};
+  try {
+    const res = await fetch(`${URL_}/rest/v1/ar_categories?select=*`, { headers: headers(), cache: "no-store" });
+    if (!res.ok) return {};
+    const rows = (await res.json()) as { slug: string; telegram_topic?: number | null }[];
+    return Object.fromEntries(rows.filter((r) => r.telegram_topic).map((r) => [r.slug, Number(r.telegram_topic)]));
+  } catch {
+    return {};
+  }
+}
