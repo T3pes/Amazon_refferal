@@ -6,6 +6,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { getCatalog } from "@/lib/catalog";
 import { breadcrumbLd, categoryDescription, itemListLd } from "@/lib/seo";
 import { SITE } from "@/lib/site";
+import { categoryHue, hueStyle } from "@/lib/palette";
 
 async function getCategory(slug: string) {
   const catalog = await getCatalog();
@@ -54,16 +55,17 @@ export default async function CategoryPage({ params }: PageProps<"/c/[slug]">) {
         <span aria-current="page">{category.name}</span>
       </nav>
 
-      <header className="rise pb-10 pt-2">
-        <p className="mb-3 text-4xl" aria-hidden>{category.emoji}</p>
-        <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl">{category.name}</h1>
-        <p className="mt-4 max-w-2xl text-lg text-muted">{category.blurb}</p>
-        <p className="mt-2 text-sm text-muted">
+      <header className="tint-art rise relative mb-10 overflow-hidden rounded-3xl p-6 sm:p-10" style={hueStyle(categoryHue(category.slug))}>
+        <span aria-hidden className="tint-watermark pointer-events-none absolute -bottom-10 -right-6 select-none text-[10rem] leading-none sm:text-[14rem]">{category.emoji}</span>
+        <span aria-hidden className="tint-disc mb-5 grid h-16 w-16 place-items-center rounded-2xl text-4xl">{category.emoji}</span>
+        <h1 className="relative font-display text-4xl font-bold tracking-tight sm:text-5xl">{category.name}</h1>
+        <p className="relative mt-3 max-w-2xl text-lg">{category.blurb}</p>
+        <p className="tint-ink relative mt-2 text-sm font-semibold">
           {products.length} {products.length === 1 ? "prodotto scelto" : "prodotti scelti"} a mano
         </p>
       </header>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="product-grid">
         {products.map((p, i) => <ProductCard key={p.asin} product={p} emoji={category.emoji} index={i} />)}
       </div>
 

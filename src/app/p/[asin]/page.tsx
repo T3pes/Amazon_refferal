@@ -8,6 +8,7 @@ import { ProductImage } from "@/components/ProductImage";
 import { Price } from "@/components/Price";
 import { getCatalog, getProduct } from "@/lib/catalog";
 import { SITE } from "@/lib/site";
+import { categoryHue } from "@/lib/palette";
 import { breadcrumbLd, clip } from "@/lib/seo";
 
 export async function generateStaticParams() {
@@ -55,7 +56,7 @@ export default async function ProductPage({ params }: PageProps<"/p/[asin]">) {
 
       <article className="grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-12">
         <div className="card rise overflow-hidden lg:sticky lg:top-24 lg:self-start">
-          <ProductImage src={product.imageUrl} alt={product.name} emoji={emoji} className="aspect-square" />
+          <ProductImage src={product.imageUrl} alt={product.name} emoji={emoji} hue={categoryHue(product.category)} className="aspect-square" />
         </div>
 
         <div className="rise flex flex-col gap-6" style={{ animationDelay: "80ms" }}>
@@ -115,7 +116,7 @@ export default async function ProductPage({ params }: PageProps<"/p/[asin]">) {
             <h2 className="font-display text-2xl font-bold">Nella stessa categoria</h2>
             {category && <Link href={`/c/${category.slug}`} className="text-sm font-medium text-accent hover:underline">Vedi tutti →</Link>}
           </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="product-grid">
             {related.map((p, i) => <ProductCard key={p.asin} product={p} emoji={emoji} index={i} />)}
           </div>
         </section>

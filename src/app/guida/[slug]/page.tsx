@@ -9,6 +9,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { getGuide } from "@/lib/catalog";
 import { breadcrumbLd, clip, itemListLd } from "@/lib/seo";
 import { SITE } from "@/lib/site";
+import { guideHue, hueStyle, isDarkGuide } from "@/lib/palette";
 
 export async function generateMetadata({ params }: PageProps<"/guida/[slug]">): Promise<Metadata> {
   const { slug } = await params;
@@ -55,19 +56,20 @@ async function GuideContent({ params }: { params: PageProps<"/guida/[slug]">["pa
         <span aria-current="page">Guide</span>
       </nav>
 
-      <header className="rise pb-10 pt-2">
-        <p className="mb-3 text-5xl" aria-hidden>{guide.emoji}</p>
-        <h1 className="max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-5xl">{guide.title}</h1>
-        {guide.intro && <p className="mt-4 max-w-2xl text-lg text-muted">{guide.intro}</p>}
-        <p className="mt-3 flex flex-wrap gap-2 text-sm">
-          <span className="rounded-full bg-accent-soft px-3 py-1 font-medium text-accent">
+      <header className={`guide-card rise mb-10 p-6 sm:p-10 ${isDarkGuide(slug) ? "dark" : ""}`} style={hueStyle(guideHue(slug))}>
+        <span aria-hidden className="tint-watermark pointer-events-none absolute -bottom-10 -right-6 select-none text-[10rem] leading-none sm:text-[14rem]">{guide.emoji}</span>
+        <p className="guide-emoji mb-4 text-5xl" aria-hidden>{guide.emoji}</p>
+        <h1 className="relative max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-5xl">{guide.title}</h1>
+        {guide.intro && <p className="relative mt-4 max-w-2xl text-lg opacity-85">{guide.intro}</p>}
+        <p className="relative mt-5 flex flex-wrap gap-2 text-sm">
+          <span className={`rounded-full px-3 py-1 font-semibold ${isDarkGuide(slug) ? "bg-[#d8b56a] text-[#1c1916]" : "tint-chip"}`}>
             {guide.products.length} {guide.products.length === 1 ? "prodotto scelto" : "prodotti scelti"} a mano
           </span>
-          {until && <span className="rounded-full bg-surface-2 px-3 py-1 text-muted">Guida valida fino al {until}</span>}
+          {until && <span className="rounded-full bg-surface/60 px-3 py-1 font-medium text-ink backdrop-blur">Valida fino al {until}</span>}
         </p>
       </header>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="product-grid">
         {guide.products.map((p, i) => <ProductCard key={p.asin} product={p} emoji={emojiOf[p.category] ?? "🛍️"} index={i} />)}
       </div>
 

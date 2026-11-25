@@ -32,7 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <header className="sticky top-0 z-30 border-b border-line/70 bg-bg/80 backdrop-blur-md">
           <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
             <Link href="/" className="flex items-center gap-2 whitespace-nowrap font-display text-lg font-bold tracking-tight">
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-accent text-accent-ink text-sm">★</span>
+              <span className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-accent to-[#e8833f] text-sm text-accent-ink shadow-md shadow-accent/30 transition-transform hover:rotate-12">★</span>
               {SITE.name}
             </Link>
             <nav className="flex items-center gap-1 text-sm">
@@ -43,13 +43,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </div>
         </header>
 
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 overflow-x-clip">{children}</main>
 
-        <footer className="mt-24 border-t border-line">
+        <footer className="mt-24 border-t border-line bg-surface-2/50">
           <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 text-sm text-muted sm:grid-cols-2 sm:px-6">
             <div>
               <p className="font-display text-base font-bold text-ink">{SITE.name}</p>
-              <p className="mt-2 max-w-sm">{SITE.disclosure}</p>
+              <p className="mt-2 max-w-sm">{SITE.tagline}. Nessuna registrazione, nessuna pubblicità.</p>
+              <p className="mt-3 max-w-sm text-xs">{SITE.disclosure}</p>
             </div>
             <div className="flex flex-wrap gap-x-5 gap-y-2 sm:justify-end">
               <Link href="/come-funziona" className="hover:text-ink">Come funziona</Link>

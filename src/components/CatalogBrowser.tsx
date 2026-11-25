@@ -56,7 +56,10 @@ export function CatalogBrowser({ categories, products }: { categories: Category[
       </div>
 
       <div className="mb-5 flex items-baseline justify-between gap-4">
-        <h2 className="font-display text-2xl font-bold">{activeCategory ? activeCategory.name : "Tutti i consigli"}</h2>
+        <div>
+          <p className="eyebrow mb-1.5">Il catalogo</p>
+          <h2 className="font-display text-2xl font-bold sm:text-3xl">{activeCategory ? activeCategory.name : "Tutti i consigli"}</h2>
+        </div>
         <p className="text-sm text-muted" aria-live="polite">{visible.length} {visible.length === 1 ? "prodotto" : "prodotti"}</p>
       </div>
       {activeCategory && (
@@ -67,7 +70,7 @@ export function CatalogBrowser({ categories, products }: { categories: Category[
       )}
 
       {visible.length > 0 ? (
-        <div key={`${cat}-${deferredQuery}`} className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div key={`${cat}-${deferredQuery}`} className="product-grid">
           {visible.map((p, i) => (
             <ProductCard key={p.asin} product={p} emoji={emojiOf[p.category] ?? "🛍️"} index={i} />
           ))}

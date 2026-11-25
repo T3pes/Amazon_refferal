@@ -29,7 +29,7 @@ export default async function DealsPage() {
         </p>
       </header>
       {deals.length > 0 ? (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="product-grid">
           {deals.map((p, i) => <ProductCard key={p.asin} product={p} emoji={emojiOf[p.category] ?? "🛍️"} index={i} />)}
         </div>
       ) : (

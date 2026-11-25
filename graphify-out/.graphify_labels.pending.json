@@ -1,7 +1,8 @@
 {
-  "1": "admin/layout.tsx",
+  "1": "next",
   "3": "app/p/[asin]/page.tsx",
   "4": "actions.ts",
+  "5": "getCatalog",
   "6": "session.ts",
   "7": "site.ts",
   "8": "catalog.ts",
