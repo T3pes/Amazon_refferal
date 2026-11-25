@@ -1,6 +1,6 @@
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
-import { buildAffiliateUrl } from "./affiliate";
+import { withPartnerTag } from "./affiliate";
 import { getItems } from "./creators-api";
 import { fetchCatalogFromSupabase, fetchGuidesFromSupabase } from "./supabase";
 import { isGuideLive, productsForGuide } from "./guides";
@@ -42,7 +42,7 @@ export async function getCatalog(): Promise<Catalog> {
       imageUrl: l?.imageUrl ?? p.imageUrl ?? null,
       live: l,
       // Il link dell'API va usato così com'è (Amazon vieta di modificarlo)
-      url: l?.detailPageUrl ?? buildAffiliateUrl(p.asin),
+      url: withPartnerTag(l?.detailPageUrl, p.asin),
     };
   });
   // "Solo in offerta": visibile finché Amazon lo segnala scontato.

@@ -25,3 +25,14 @@ export function extractAsin(input: string): string | null {
   const m = s.match(/(?:\/dp\/|\/gp\/product\/|\/ASIN\/)([A-Z0-9]{10})/i);
   return m ? m[1].toUpperCase() : null;
 }
+
+/** Usa il link di Amazon solo se porta il nostro tag; altrimenti il link standard con il tag. */
+export function withPartnerTag(url: string | null | undefined, asin: string, tag: string = partnerTag()): string {
+  try {
+    if (url) {
+      const u = new URL(url);
+      if (/(^|\.)amazon\.it$/.test(u.hostname) && u.searchParams.get("tag") === tag) return url;
+    }
+  } catch {}
+  return buildAffiliateUrl(asin, tag);
+}
