@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps<"/p/[asin]">): Prom
   const { asin } = await params;
   const { product } = await getProduct(asin);
   if (!product) return {};
-  return { title: product.name, description: product.note };
+  return { title: product.name, description: product.note || `${product.name}: scelto da ${SITE.name}.` };
 }
 
 export default async function ProductPage({ params }: PageProps<"/p/[asin]">) {
@@ -56,10 +56,12 @@ export default async function ProductPage({ params }: PageProps<"/p/[asin]">) {
             </a>
           </div>
 
-          <section>
-            <h2 className="mb-2 font-display text-xl font-semibold">Perché lo consiglio</h2>
-            <p className="text-lg leading-relaxed">{product.note}</p>
-          </section>
+          {product.note && (
+            <section>
+              <h2 className="mb-2 font-display text-xl font-semibold">Perché lo consiglio</h2>
+              <p className="text-lg leading-relaxed">{product.note}</p>
+            </section>
+          )}
 
           {(product.pros?.length || product.cons?.length) ? (
             <section className="grid gap-4 sm:grid-cols-2">

@@ -28,7 +28,7 @@ export function ProductCard({ product, emoji, index = 0 }: { product: Product; e
           <h3 className="font-display text-lg font-semibold leading-snug">
             <Link href={`/p/${product.asin}`} className="hover:text-accent">{title}</Link>
           </h3>
-          <p className="mt-1.5 line-clamp-2 text-sm text-muted">{product.note}</p>
+          {product.note && <p className="mt-1.5 line-clamp-2 text-sm text-muted">{product.note}</p>}
         </div>
         {product.tags && product.tags.length > 0 && (
           <ul className="flex flex-wrap gap-1.5">

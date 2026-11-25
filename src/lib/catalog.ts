@@ -29,7 +29,11 @@ export async function getCatalog(): Promise<Catalog> {
     };
   });
 
-  return { categories: source.categories, products, updatedAt: new Date().toISOString() };
+  // Mostra solo le categorie che hanno almeno un prodotto
+  const used = new Set(products.map((p) => p.category));
+  const categories = source.categories.filter((c) => used.has(c.slug));
+
+  return { categories, products, updatedAt: new Date().toISOString() };
 }
 
 export async function getProduct(asin: string) {

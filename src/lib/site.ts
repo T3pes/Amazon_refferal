@@ -1,5 +1,5 @@
 export const SITE = {
-  name: "Scelti da Flavio",
+  name: "Deals Forever",
   tagline: "Prodotti Amazon che consiglierei a un amico",
   description:
     "Una selezione curata di prodotti Amazon, scelti e provati uno per uno. Niente registrazione: sfoglia, confronta e acquista su Amazon.",

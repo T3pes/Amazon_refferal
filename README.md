@@ -1,4 +1,4 @@
-# Scelti da Flavio · catalogo Amazon affiliato
+# Deals Forever · catalogo Amazon affiliato
 
 Catalogo pubblico (senza registrazione) di prodotti Amazon scelti a mano, con link affiliato `dealsforev0bc-21`.
 
