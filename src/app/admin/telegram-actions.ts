@@ -35,7 +35,7 @@ export async function sendProductAction(_: TgState, form: FormData): Promise<TgS
     const emoji = categories.find((c) => c.slug === p.category)?.emoji ?? "🛍️";
     await sendTelegram(productMessage(p, { emoji, siteUrl: SITE.url, photo: p.imageUrl }), p.category);
     await logManual(session, asin);
-    return { ok: "Inviato sul gruppo Telegram." };
+    return { ok: `Inviato nel gruppo${p.category ? ` (argomento ${categories.find((c) => c.slug === p.category)?.name ?? p.category})` : ""}.` };
   } catch (err) {
     return { error: (err as Error).message };
   }
@@ -73,7 +73,7 @@ export async function publishDealsNowAction(): Promise<TgState> {
     const r = await publishNewDeals();
     if (r.inviate.length === 0) {
       if (r.note.length) return { error: r.note.join(" ") };
-      return { ok: "Niente di nuovo da pubblicare: i prodotti e le offerte sul sito sono già stati inviati al gruppo." };
+      return { error: "Nessun messaggio inviato: non ci sono prodotti nuovi né offerte da pubblicare. I prodotti già presenti contano come già annunciati: per mandarne uno usa \"Invia\" qui sotto." };
     }
     return { ok: `Inviati ${r.inviate.length} prodotti: ${r.inviate.join(", ")}.${r.note.length ? ` ${r.note.join(" ")}` : ""}` };
   } catch (err) {

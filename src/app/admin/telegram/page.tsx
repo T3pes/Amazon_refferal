@@ -5,7 +5,8 @@ import { getCatalog } from "@/lib/catalog";
 import { guard } from "../guard";
 import { NotAdmin } from "../NotAdmin";
 import { TelegramButton } from "../TelegramButton";
-import { publishDealsNowAction, sendTestAction } from "../telegram-actions";
+import { publishDealsNowAction, sendProductAction, sendTestAction } from "../telegram-actions";
+import { adminRest } from "@/lib/admin/db";
 
 export default function TelegramPage() {
   return (
@@ -26,7 +27,13 @@ async function Panel() {
     try { chats = await recentChats(); } catch (e) { chatsError = e instanceof Error ? e.message : String(e); }
   }
   const diag: BotDiagnosis | null = cfg.token && chats.length === 0 ? await botDiagnosis().catch(() => null) : null;
-  const { categories } = await getCatalog();
+  const { categories, products: visible } = await getCatalog();
+  const onSite = new Set(visible.map((p) => p.asin));
+  const recent = await adminRest<{ asin: string; name: string; created_at: string }[]>(session, "ar_products?select=asin,name,created_at&active=eq.true&order=created_at.desc&limit=15").catch(() => []);
+  const sent = await adminRest<{ ref: string; kind: string; posted_at: string }[]>(session, "ar_telegram_posts?select=ref,kind,posted_at&kind=in.(manuale,offerta)&order=posted_at.desc&limit=500").catch(() => []);
+  const lastSent = new Map<string, string>();
+  for (const r of sent) if (!lastSent.has(r.ref)) lastSent.set(r.ref, r.posted_at);
+  const fmt = (d: string) => new Date(d).toLocaleString("it-IT", { timeZone: "Europe/Rome", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
   const topicNames = new Map(chats.flatMap((c) => c.topics.map((t) => [t.id, t.name] as const)));
 
   return (
@@ -82,6 +89,28 @@ async function Panel() {
         <section className="card flex flex-wrap gap-4 p-6">
           <TelegramButton action={sendTestAction} label="Invia messaggio di prova" />
           <TelegramButton action={publishDealsNowAction} label="Pubblica ora prodotti nuovi e offerte" className="btn btn-primary" />
+        </section>
+      )}
+
+      {cfg.token && cfg.chat && recent.length > 0 && (
+        <section className="card grid gap-3 p-6">
+          <h2 className="font-display text-xl font-semibold">Invia un prodotto adesso</h2>
+          <p className="text-sm text-muted">Gli ultimi prodotti aggiunti, dal più recente. Il messaggio va nell&apos;argomento della sua categoria.</p>
+          <ul className="grid gap-2">
+            {recent.map((p) => (
+              <li key={p.asin} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-2 px-4 py-3 text-sm">
+                <span className="grid">
+                  <span className="font-medium">{p.name}</span>
+                  <span className="text-xs text-muted">
+                    Aggiunto {fmt(p.created_at)} · {lastSent.has(p.asin) ? `inviato a mano il ${fmt(lastSent.get(p.asin)!)}` : "mai inviato a mano"}
+                  </span>
+                </span>
+                {onSite.has(p.asin)
+                  ? <TelegramButton action={sendProductAction} name="asin" value={p.asin} label="Invia" />
+                  : <span className="text-xs text-muted">non visibile sul sito</span>}
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 
