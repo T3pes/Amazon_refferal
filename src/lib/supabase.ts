@@ -106,3 +106,20 @@ export async function fetchCategoryTopics(): Promise<Record<string, number>> {
     return {};
   }
 }
+
+/** Prodotto nuovo mai inviato al gruppo? Lo registra subito. null = funzione SQL 0008 mancante. */
+export async function claimTelegramNew(asin: string): Promise<boolean | null> {
+  if (!supabaseConfigured()) return null;
+  try {
+    const res = await fetch(`${URL_}/rest/v1/rpc/ar_telegram_claim_new`, {
+      method: "POST",
+      headers: headers({ "Content-Type": "application/json" }),
+      body: JSON.stringify({ p_ref: asin }),
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return (await res.json()) === true;
+  } catch {
+    return null;
+  }
+}

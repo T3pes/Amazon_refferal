@@ -34,7 +34,7 @@ async function Panel() {
       <Link href="/admin" className="text-sm text-muted hover:text-ink">← Catalogo</Link>
       <header>
         <h1 className="font-display text-3xl font-bold">Gruppo Telegram</h1>
-        <p className="mt-1 text-muted">Le offerte del sito arrivano da sole nel gruppo, ognuna nel suo argomento, ogni mattina alle 9. Puoi anche inviare a mano prodotti e guide.</p>
+        <p className="mt-1 text-muted">Ogni mattina alle 9 arrivano da soli nel gruppo i prodotti nuovi che aggiungi e le offerte, ognuno nel suo argomento. Puoi anche inviare subito un singolo prodotto o una guida dalla sua pagina in admin.</p>
       </header>
 
       <section className="card grid gap-3 p-6">
@@ -81,7 +81,7 @@ async function Panel() {
       {cfg.token && cfg.chat && (
         <section className="card flex flex-wrap gap-4 p-6">
           <TelegramButton action={sendTestAction} label="Invia messaggio di prova" />
-          <TelegramButton action={publishDealsNowAction} label="Pubblica ora le offerte nuove" className="btn btn-primary" />
+          <TelegramButton action={publishDealsNowAction} label="Pubblica ora prodotti nuovi e offerte" className="btn btn-primary" />
         </section>
       )}
 

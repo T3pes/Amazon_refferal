@@ -71,9 +71,11 @@ export async function publishDealsNowAction(): Promise<TgState> {
   if (!(await adminOrNull())) return { error: "Account non abilitato." };
   try {
     const r = await publishNewDeals();
-    if (r.nota) return { error: r.nota };
-    if (r.inviate.length === 0) return { ok: r.offerte === 0 ? "Nessuna offerta sul sito in questo momento." : `Nessuna offerta nuova: ${r.giaInviate} già pubblicate negli ultimi 7 giorni.` };
-    return { ok: `Pubblicate ${r.inviate.length} offerte: ${r.inviate.join(", ")}.` };
+    if (r.inviate.length === 0) {
+      if (r.note.length) return { error: r.note.join(" ") };
+      return { ok: "Niente di nuovo da pubblicare: i prodotti e le offerte sul sito sono già stati inviati al gruppo." };
+    }
+    return { ok: `Inviati ${r.inviate.length} prodotti: ${r.inviate.join(", ")}.${r.note.length ? ` ${r.note.join(" ")}` : ""}` };
   } catch (err) {
     return { error: (err as Error).message };
   }
