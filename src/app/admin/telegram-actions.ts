@@ -6,7 +6,7 @@ import { adminRest, isAdmin } from "@/lib/admin/db";
 import { getCatalog } from "@/lib/catalog";
 import { isValidAsin } from "@/lib/affiliate";
 import { SITE } from "@/lib/site";
-import { sendTelegram } from "@/lib/telegram";
+import { deleteTelegram, sendTelegram } from "@/lib/telegram";
 import { publishNewDeals } from "@/lib/telegram-deals";
 import { guideMessage, productMessage } from "@/lib/telegram-format";
 
@@ -18,9 +18,21 @@ async function adminOrNull() {
   return (await isAdmin(s)) ? s : null;
 }
 
-async function logManual(session: NonNullable<Awaited<ReturnType<typeof adminOrNull>>>, ref: string) {
+type AdminSession = NonNullable<Awaited<ReturnType<typeof adminOrNull>>>;
+
+async function logManual(session: AdminSession, ref: string, messageId?: number) {
   // Lo storico è facoltativo: se la tabella non c'è ancora, l'invio vale lo stesso
-  await adminRest(session, "ar_telegram_posts", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ kind: "manuale", ref }) }).catch(() => {});
+  await adminRest(session, "ar_telegram_posts", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ kind: "manuale", ref, message_id: messageId ?? null }) }).catch(() => {});
+}
+
+/** Cancella dal gruppo i messaggi già inviati per questo prodotto/guida (se ne conosciamo il numero). */
+async function removePrevious(session: AdminSession, ref: string): Promise<number> {
+  const rows = await adminRest<{ id: number; message_id: number | null }[]>(session, `ar_telegram_posts?select=id,message_id&ref=eq.${encodeURIComponent(ref)}&message_id=not.is.null`).catch(() => []);
+  let n = 0;
+  for (const r of rows) {
+    if (r.message_id && (await deleteTelegram(r.message_id))) n++;
+  }
+  return n;
 }
 
 export async function sendProductAction(_: TgState, form: FormData): Promise<TgState> {
@@ -33,8 +45,10 @@ export async function sendProductAction(_: TgState, form: FormData): Promise<TgS
   if (!p) return { error: "Il prodotto non è visibile sul sito: rendilo visibile prima di inviarlo." };
   try {
     const emoji = categories.find((c) => c.slug === p.category)?.emoji ?? "🛍️";
-    await sendTelegram(productMessage(p, { emoji, siteUrl: SITE.url, photo: p.imageUrl }), p.category);
-    await logManual(session, asin);
+    const removed = await removePrevious(session, asin);
+    const id = await sendTelegram(productMessage(p, { emoji, siteUrl: SITE.url, photo: p.imageUrl }), p.category);
+    await logManual(session, asin, id);
+    if (removed) return { ok: `Inviato nel gruppo al posto del messaggio precedente (argomento ${categories.find((c) => c.slug === p.category)?.name ?? p.category}).` };
     return { ok: `Inviato nel gruppo${p.category ? ` (argomento ${categories.find((c) => c.slug === p.category)?.name ?? p.category})` : ""}.` };
   } catch (err) {
     return { error: (err as Error).message };

@@ -49,20 +49,22 @@ async function call<T>(method: string, body?: Record<string, unknown>): Promise<
   return json.result as T;
 }
 
-export async function sendTelegram(msg: TelegramMessage, category?: string): Promise<void> {
+/** Invia il messaggio e restituisce il suo numero (serve per poterlo cancellare o sostituire). */
+export async function sendTelegram(msg: TelegramMessage, category?: string): Promise<number> {
   const chat_id = CHAT();
   if (!chat_id) throw new Error("Manca TELEGRAM_CHAT_ID su Vercel.");
   const reply_markup = { inline_keyboard: [[{ text: msg.buttonText, url: msg.buttonUrl }]] };
   const message_thread_id = await threadFor(category);
   if (msg.photo) {
     try {
-      await call("sendPhoto", { chat_id, message_thread_id, photo: msg.photo, caption: msg.text, parse_mode: "HTML", reply_markup });
-      return;
+      const r = await call<{ message_id: number }>("sendPhoto", { chat_id, message_thread_id, photo: msg.photo, caption: msg.text, parse_mode: "HTML", reply_markup });
+      return r.message_id;
     } catch {
       /* se la foto non va, invia almeno il testo */
     }
   }
-  await call("sendMessage", { chat_id, message_thread_id, text: msg.text, parse_mode: "HTML", reply_markup, link_preview_options: { is_disabled: true } });
+  const r = await call<{ message_id: number }>("sendMessage", { chat_id, message_thread_id, text: msg.text, parse_mode: "HTML", reply_markup, link_preview_options: { is_disabled: true } });
+  return r.message_id;
 }
 
 export async function botInfo(): Promise<{ username: string } | null> {
@@ -105,4 +107,11 @@ export async function botDiagnosis(): Promise<BotDiagnosis> {
   const w = await call<{ url?: string; pending_update_count?: number; last_error_message?: string }>("getWebhookInfo");
   const me = await call<{ can_read_all_group_messages?: boolean }>("getMe");
   return { webhook: w.url || undefined, pending: w.pending_update_count ?? 0, lastError: w.last_error_message, readsAll: me.can_read_all_group_messages };
+}
+
+/** Cancella un messaggio del bot nel gruppo (Telegram lo permette entro 48 ore). true se cancellato. */
+export async function deleteTelegram(messageId: number): Promise<boolean> {
+  const chat_id = CHAT();
+  if (!chat_id) return false;
+  try { await call("deleteMessage", { chat_id, message_id: messageId }); return true; } catch { return false; }
 }
