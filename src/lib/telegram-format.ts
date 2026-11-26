@@ -22,8 +22,17 @@ export type TelegramMessage = { text: string; buttonText: string; buttonUrl: str
 
 /**
  * Scheda prodotto per il gruppo: foto, sconto e prezzo (solo se arrivano da Amazon), descrizione e punti forti.
- * Senza foto del prodotto usa l'anteprima grafica della pagina del sito.
+ * La foto passa sempre dal formato standard del sito (quadrato 1080x1080, sfondo bianco):
+ * così tutti i post hanno la stessa forma. `photo` serve solo a cambiare il link quando cambia la foto,
+ * perché Telegram tiene in cache le immagini per indirizzo.
  */
+/** Hash corto e stabile (djb2) per la versione dell'immagine. */
+export function shortHash(s: string): string {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+  return h.toString(36);
+}
+
 export function productMessage(p: MsgProduct, opts: { emoji: string; siteUrl: string; photo?: string | null }): TelegramMessage {
   const saving = p.live?.savingPercent ?? 0;
   const lines: string[] = [];
@@ -42,7 +51,7 @@ export function productMessage(p: MsgProduct, opts: { emoji: string; siteUrl: st
     text: lines.join("\n").slice(0, 1000), // limite didascalia foto di Telegram: 1024
     buttonText: saving > 0 ? "🛒 Vedi l'offerta" : "🛒 Scopri di più",
     buttonUrl: withUtm(`${opts.siteUrl}/p/${p.asin}`),
-    photo: opts.photo || `${opts.siteUrl}/p/${p.asin}/opengraph-image`,
+    photo: `${opts.siteUrl}/api/telegram/img/${p.asin}?v=${shortHash(opts.photo ?? "")}`,
   };
 }
 
