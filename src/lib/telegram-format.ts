@@ -14,28 +14,35 @@ export function withUtm(url: string): string {
 }
 
 type MsgProduct = {
-  asin: string; name: string; note: string; featured?: boolean;
+  asin: string; name: string; note: string; featured?: boolean; pros?: string[];
   live: { price?: string; listPrice?: string; savingPercent?: number } | null;
 };
 
 export type TelegramMessage = { text: string; buttonText: string; buttonUrl: string; photo?: string | null };
 
+/**
+ * Scheda prodotto per il gruppo: foto, sconto e prezzo (solo se arrivano da Amazon), descrizione e punti forti.
+ * Senza foto del prodotto usa l'anteprima grafica della pagina del sito.
+ */
 export function productMessage(p: MsgProduct, opts: { emoji: string; siteUrl: string; photo?: string | null }): TelegramMessage {
   const saving = p.live?.savingPercent ?? 0;
   const lines: string[] = [];
-  if (saving > 0) lines.push(`🔥 <b>OFFERTA −${saving}%</b>`);
-  else if (p.featured) lines.push("⭐ <b>Uno dei miei preferiti</b>");
+  if (saving > 0) lines.push(`🔥 <b>OFFERTA −${saving}%</b>`, "");
+  else if (p.featured) lines.push("⭐ <b>Uno dei miei preferiti</b>", "");
   lines.push(`${opts.emoji} <b>${escapeHtml(p.name)}</b>`);
   if (p.live?.price) {
-    lines.push(`💶 <b>${escapeHtml(p.live.price)}</b>${p.live.listPrice && saving > 0 ? ` invece di <s>${escapeHtml(p.live.listPrice)}</s>` : ""}`);
+    const was = p.live.listPrice && saving > 0 ? `  <s>${escapeHtml(p.live.listPrice)}</s>` : "";
+    lines.push("", `💶 <b>${escapeHtml(p.live.price)}</b>${was}${saving > 0 ? `  (−${saving}%)` : ""}`);
   }
   if (p.note) lines.push("", escapeHtml(p.note));
+  const pros = (p.pros ?? []).filter(Boolean).slice(0, 3);
+  if (pros.length) lines.push("", ...pros.map((x) => `✅ ${escapeHtml(x)}`));
   if (p.live?.price) lines.push("", "<i>Prezzo rilevato da Amazon: può cambiare in qualsiasi momento.</i>");
   return {
-    text: lines.join("\n"),
-    buttonText: saving > 0 ? "Vedi l'offerta" : "Scopri di più",
+    text: lines.join("\n").slice(0, 1000), // limite didascalia foto di Telegram: 1024
+    buttonText: saving > 0 ? "🛒 Vedi l'offerta" : "🛒 Scopri di più",
     buttonUrl: withUtm(`${opts.siteUrl}/p/${p.asin}`),
-    photo: opts.photo ?? null,
+    photo: opts.photo || `${opts.siteUrl}/p/${p.asin}/opengraph-image`,
   };
 }
 

@@ -35,3 +35,12 @@ test("messaggio guida", () => {
 test("withUtm conserva i parametri esistenti", () => {
   assert.equal(withUtm("https://x.app/a?b=1"), "https://x.app/a?b=1&utm_source=telegram&utm_medium=canale");
 });
+
+test("scheda con punti forti e foto di riserva dal sito", () => {
+  const m = productMessage({ asin: "B09B8X9RGM", name: "Echo", note: "Bello", pros: ["Piccolo", "Audio pieno"], live: null }, { emoji: "🎧", siteUrl: "https://x.app" });
+  assert.match(m.text, /✅ Piccolo/);
+  assert.equal(m.photo, "https://x.app/p/B09B8X9RGM/opengraph-image");
+  const o = productMessage({ asin: "B09B8X9RGM", name: "Echo", note: "", live: { price: "29,99 €", listPrice: "59,99 €", savingPercent: 50 } }, { emoji: "🎧", siteUrl: "https://x.app", photo: "https://m.media-amazon.com/x.jpg" });
+  assert.match(o.text, /29,99 €.*<s>59,99 €<\/s>.*−50%/);
+  assert.equal(o.photo, "https://m.media-amazon.com/x.jpg");
+});
