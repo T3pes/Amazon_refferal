@@ -6,8 +6,8 @@ import { hueStyle } from "@/lib/palette";
 export function ProductImage({ src, alt, emoji, hue = 30, className = "", padded = "p-6" }: { src?: string | null; alt: string; emoji: string; hue?: number; className?: string; padded?: string }) {
   if (src) {
     return (
-      <div className={`grid place-items-center bg-white ${className}`}>
-        <img src={src} alt={alt} loading="lazy" className={`h-full w-full object-contain ${padded} mix-blend-multiply transition-transform duration-500 group-hover:scale-105`} />
+      <div className={`relative overflow-hidden bg-white ${className}`}>
+        <img src={src} alt={alt} loading="lazy" className={`absolute inset-0 h-full w-full object-contain ${padded} mix-blend-multiply transition-transform duration-500 group-hover:scale-105`} />
       </div>
     );
   }
