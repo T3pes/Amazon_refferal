@@ -35,6 +35,11 @@ export async function renameTopic(id: number, name: string): Promise<void> {
   await call("editForumTopic", { chat_id, message_thread_id: id, name: name.slice(0, 128) });
 }
 
+/** Chiamata generica alla Bot API (serve al bot che riceve i link). */
+export function tgCall<T>(method: string, body?: Record<string, unknown>): Promise<T> {
+  return call<T>(method, body);
+}
+
 async function call<T>(method: string, body?: Record<string, unknown>): Promise<T> {
   const token = TOKEN();
   if (!token) throw new Error("Manca TELEGRAM_BOT_TOKEN su Vercel.");

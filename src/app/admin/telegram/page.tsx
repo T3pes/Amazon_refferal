@@ -5,7 +5,8 @@ import { getCatalog } from "@/lib/catalog";
 import { guard } from "../guard";
 import { NotAdmin } from "../NotAdmin";
 import { TelegramButton } from "../TelegramButton";
-import { publishDealsNowAction, sendProductAction, sendTestAction } from "../telegram-actions";
+import { SITE } from "@/lib/site";
+import { connectBotAction, publishDealsNowAction, sendProductAction, sendTestAction } from "../telegram-actions";
 import { adminRest } from "@/lib/admin/db";
 
 export default function TelegramPage() {
@@ -23,10 +24,13 @@ async function Panel() {
   const bot = cfg.token ? await botInfo() : null;
   let chats: FoundChat[] = [];
   let chatsError = "";
-  if (cfg.token) {
+  // Con il bot collegato (webhook) Telegram non permette di leggere i messaggi recenti: non serve più
+  const info = cfg.token ? await botDiagnosis().catch(() => null) : null;
+  const botLinked = info?.webhook === `${SITE.url}/api/telegram/bot`;
+  if (cfg.token && !botLinked) {
     try { chats = await recentChats(); } catch (e) { chatsError = e instanceof Error ? e.message : String(e); }
   }
-  const diag: BotDiagnosis | null = cfg.token && chats.length === 0 ? await botDiagnosis().catch(() => null) : null;
+  const diag: BotDiagnosis | null = cfg.token && chats.length === 0 && !botLinked ? info : null;
   const { categories, products: visible } = await getCatalog();
   const onSite = new Set(visible.map((p) => p.asin));
   const recent = await adminRest<{ asin: string; name: string; created_at: string }[]>(session, "ar_products?select=asin,name,created_at&active=eq.true&order=created_at.desc&limit=15").catch(() => []);
@@ -82,6 +86,18 @@ async function Panel() {
             <code className="ml-1 rounded bg-surface-2 px-1.5 py-0.5">tech:12, casa:34, sport:56, funko:78</code>.
             Categorie del sito: {categories.map((c) => c.slug).join(", ")}. Le guide e le categorie senza argomento vanno in General.
           </p>
+        </section>
+      )}
+
+      {cfg.token && cfg.chat && (
+        <section className="card grid gap-3 p-6">
+          <h2 className="font-display text-xl font-semibold">Aggiungi prodotti dal telefono</h2>
+          <p className="text-sm text-muted">
+            Nell&apos;app Amazon premi <b>Condividi</b> su un prodotto e mandalo in privato a {bot ? `@${bot.username}` : "il bot"}: scegli la categoria
+            e il prodotto va sul sito (con il tuo link referral) e nel gruppo. Lo possono usare solo gli amministratori del gruppo.
+          </p>
+          <p className="text-sm">{botLinked ? "✅ Bot collegato al sito." : "Il bot non è ancora collegato al sito."}</p>
+          <TelegramButton action={connectBotAction} label={botLinked ? "Ricollega il bot" : "Collega il bot"} className={botLinked ? "btn btn-ghost" : "btn btn-primary"} />
         </section>
       )}
 

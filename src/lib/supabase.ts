@@ -123,3 +123,21 @@ export async function claimTelegramNew(asin: string): Promise<boolean | null> {
     return null;
   }
 }
+
+/** Funzione SQL (RPC) con la chiave pubblica. Errori → null. */
+export async function rpc<T>(name: string, body: Record<string, unknown>): Promise<T | null> {
+  if (!supabaseConfigured()) return null;
+  try {
+    const res = await fetch(`${URL_}/rest/v1/rpc/${name}`, {
+      method: "POST",
+      headers: headers({ "Content-Type": "application/json" }),
+      body: JSON.stringify(body),
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const text = await res.text();
+    return (text ? JSON.parse(text) : null) as T;
+  } catch {
+    return null;
+  }
+}

@@ -9,6 +9,7 @@ import { SITE } from "@/lib/site";
 import { deleteTelegram, sendTelegram } from "@/lib/telegram";
 import { publishNewDeals } from "@/lib/telegram-deals";
 import { guideMessage, productMessage } from "@/lib/telegram-format";
+import { botKey, connectWebhook, sha256 } from "@/lib/telegram-bot";
 
 export type TgState = { ok?: string; error?: string } | undefined;
 
@@ -90,6 +91,22 @@ export async function publishDealsNowAction(): Promise<TgState> {
       return { error: "Nessun messaggio inviato: non ci sono prodotti nuovi né offerte da pubblicare. I prodotti già presenti contano come già annunciati: per mandarne uno usa \"Invia\" qui sotto." };
     }
     return { ok: `Inviati ${r.inviate.length} prodotti: ${r.inviate.join(", ")}.${r.note.length ? ` ${r.note.join(" ")}` : ""}` };
+  } catch (err) {
+    return { error: (err as Error).message };
+  }
+}
+
+/** Collega il bot: webhook verso il sito + chiave salvata su Supabase (solo admin). */
+export async function connectBotAction(): Promise<TgState> {
+  const session = await adminOrNull();
+  if (!session) return { error: "Account non abilitato." };
+  const key = botKey();
+  if (!key) return { error: "Manca CRON_SECRET su Vercel." };
+  try {
+    const ok = await adminRest<boolean>(session, "rpc/ar_bot_set_key", { method: "POST", body: JSON.stringify({ p_hash: sha256(key) }) });
+    if (ok !== true) return { error: "Supabase non ha accettato la chiave del bot." };
+    await connectWebhook();
+    return { ok: "Bot collegato: scrivigli in privato e condividi un prodotto dall'app Amazon." };
   } catch (err) {
     return { error: (err as Error).message };
   }

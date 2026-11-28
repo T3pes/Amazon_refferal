@@ -22,7 +22,7 @@ export function buildAffiliateUrl(asin: string, tag: string = partnerTag()): str
 export function extractAsin(input: string): string | null {
   const s = input.trim();
   if (isValidAsin(s.toUpperCase())) return s.toUpperCase();
-  const m = s.match(/(?:\/dp\/|\/gp\/product\/|\/ASIN\/)([A-Z0-9]{10})/i);
+  const m = s.match(/(?:\/dp\/|\/gp\/product\/|\/gp\/aw\/d\/|\/ASIN\/)([A-Z0-9]{10})/i);
   return m ? m[1].toUpperCase() : null;
 }
 
